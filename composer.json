@@ -1,0 +1,20 @@
+{
+  "name": "lvinkim/daemon",
+  "require": {
+    "php": "^7.1",
+    "ext-swoole": "^4.0"
+  },
+  "require-dev": {
+    "swoft/swoole-ide-helper": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Lvinkim\\Daemon\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Lvinkim\\Daemon\\Tests\\": "tests/"
+    }
+  }
+}

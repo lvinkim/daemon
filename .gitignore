@@ -1,0 +1,11 @@
+/*
+
+!.gitignore
+!/src/
+!/tests/
+
+!composer.json
+!daemon.example.ini
+!docker-compose.yml
+!README.md
+!xdebug.disable.ini
