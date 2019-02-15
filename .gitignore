@@ -3,6 +3,7 @@
 !.gitignore
 !/src/
 !/tests/
+!/var/
 
 !composer.json
 !daemon.example.ini
