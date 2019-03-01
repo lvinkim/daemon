@@ -69,6 +69,8 @@ class DaemonTask
      */
     public function run()
     {
+        $coroutineId = $this->wait();
+
         while (1) {
             /** @var Task[] $tasks */
             $tasks = call_user_func($this->taskGenerator);
@@ -80,14 +82,16 @@ class DaemonTask
                 }
 
                 if ($this->isRunning($task)) {
+                    if (!$this->silent) {
+                        printf("任务: %s, 正在运行于进程: %s\n", $task->getId(), $this->getRunningPid($task));
+                    }
                     continue;
                 }
+
                 if ($this->hasFreeProcess()) {
                     $this->startTask($task);
                 }
             }
-
-            $coroutineId = $this->wait();
 
             if ($this->generateInterval < 1) {
                 throw new \ErrorException("generateInterval must greater than 0");
@@ -111,7 +115,12 @@ class DaemonTask
             while (1) {
                 if ($ret = Process::wait(false)) {
                     $pid = intval($ret["pid"] ?? 0);
-                    $this->releaseTaskByPid($pid);
+                    $succeed = $this->releaseTaskByPid($pid);
+
+                    if (!$this->silent) {
+                        printf("回收进程: %s, 结果 %s\n", $pid, intval($succeed));
+                    }
+
                 } else {
                     Coroutine::yield();
                 }
@@ -124,14 +133,20 @@ class DaemonTask
     /**
      * 释放已退出的进程
      * @param int $pid
+     * @return bool
      */
-    private function releaseTaskByPid(int $pid)
+    private function releaseTaskByPid(int $pid): bool
     {
+        $succeed = false;
         foreach ($this->runningTasks as $index => $runningTask) {
             if ($runningTask->getPid() == $pid) {
                 unset($this->runningTasks[$index]);
+                $succeed = true;
             }
         }
+        $this->runningTasks = array_values($this->runningTasks);
+
+        return $succeed;
     }
 
     /**
@@ -147,7 +162,7 @@ class DaemonTask
         });
         $pid = $process->start();
 
-        $task->setPid($pid);
+        $task->setPid(strval($pid));
         $this->runningTasks[] = $task;
 
         if (!$this->silent) {
@@ -185,5 +200,20 @@ class DaemonTask
             }
         }
         return false;
+    }
+
+    /**
+     * @param Task $task
+     * @return string
+     */
+    private function getRunningPid(Task $task): string
+    {
+        $runningPid = "";
+        foreach ($this->runningTasks as $runningTask) {
+            if ($runningTask->getId() === $task->getId()) {
+                $runningPid = $runningTask->getPid();
+            }
+        }
+        return $runningPid;
     }
 }

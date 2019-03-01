@@ -26,11 +26,12 @@ $taskGenerator = function () {
         $task->setId($id);
         $task->setCommand($command);
 
-        printf("生成任务 %s\n", $id);
+        printf("【任务生成器】生成任务 %s\n", $id);
 
         yield $task;
     }
 };
+
 $maxProcess = 3;
 $generateInterval = 10;
 
