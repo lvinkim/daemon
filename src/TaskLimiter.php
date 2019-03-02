@@ -78,7 +78,7 @@ class TaskLimiter
                 $task = call_user_func($this->taskBuilder);
 
                 if (!($task instanceof Task)) {
-                    printf("task must be Lvinkim\Daemon\Model\Task instance");
+                    printf("task must be Lvinkim\Daemon\Model\Task instance\n");
                 } else {
                     if ($this->isRunning($task)) {
                         if (!$this->silent) {
@@ -106,7 +106,7 @@ class TaskLimiter
 
                 for ($i = 0; $i < $this->generateInterval; $i++) {
                     Coroutine::resume($coroutineId);
-                    sleep(1);
+                    usleep(100000);
                 }
             }
         }
