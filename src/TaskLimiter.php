@@ -90,7 +90,7 @@ class TaskLimiter
                     }
                 }
 
-                sleep(1);
+                usleep(200000);
                 Coroutine::resume($coroutineId);
 
             } else {
